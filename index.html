@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUST Project Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --must-blue: #0056b3;
+            --must-light-blue: #3498db;
+            --must-dark: #2c3e50;
+            --must-white: #ffffff;
+            --must-success: #2ecc71;
+            --must-warning: #e67e22;
+            --must-error: #e74c3c;
+            --must-gold: #FFD700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--must-blue) 0%, var(--must-dark) 100%);
+            color: var(--must-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+        
+        .university-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--must-white);
+        }
+        
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background elements */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: 2s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10px, 10px) rotate(5deg); }
+            50% { transform: translate(0, 15px) rotate(0deg); }
+            75% { transform: translate(-10px, 5px) rotate(-5deg); }
+        }
+        
+        /* Typing animation for title */
+        .welcome-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--must-gold);
+            animation: typing 2s steps(20, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--must-gold) }
+        }
+        
+        .welcome-subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 2s;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1 }
+        }
+        
+        .role-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUpFadeIn 1s ease-out forwards 2.5s;
+        }
+        
+        @keyframes slideUpFadeIn {
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .role-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem 1.5rem;
+            width: 280px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--must-white);
+        }
+        
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--must-gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .role-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--must-gold);
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        
+        .role-card:hover .role-icon {
+            transform: scale(1.2);
+            color: var(--must-white);
+        }
+        
+        .role-name {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .role-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .stats-counter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 3s;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--must-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .register-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--must-gold);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid var(--must-gold);
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 3s;
+        }
+
+        .register-link:hover {
+            background: var(--must-gold);
+            color: var(--must-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 3.5s;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--must-gold);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            color: var(--must-white);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .role-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .role-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .welcome-title {
+                font-size: 2.2rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                padding: 0.5rem;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+            
+            .university-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="assets/images/must-logo.png" alt="MUST Logo" class="logo">
+            <div class="university-name">Mbeya University of Science and Technology</div>
+        </div>
+    </header>
+    
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    
+    <div class="welcome-container">
+        <h1 class="welcome-title">MUST Project Management System</h1>
+        <p class="welcome-subtitle">Streamlining research and academic projects for students and faculty</p>
+        
+        <div class="role-selection">
+            <a href="pages/auth/login.html" class="role-card">
+                <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
+                <h3 class="role-name">Student</h3>
+                <p class="role-desc">Track your project progress and submissions</p>
+            </a>
+            
+            <a href="pages/auth/login.html" class="role-card">
+                <div class="role-icon"><i class="fas fa-user-tie"></i></div>
+                <h3 class="role-name">Supervisor</h3>
+                <p class="role-desc">Manage and evaluate student projects</p>
+            </a>
+            
+            <a href="pages/auth/login.html" class="role-card">
+                <div class="role-icon"><i class="fas fa-user-shield"></i></div>
+                <h3 class="role-name">Coordinator</h3>
+                <p class="role-desc">Administer the entire system</p>
+            </a>
+        </div>
+
+        <a href="pages/auth/register.html" class="register-link">
+            <i class="fas fa-user-plus"></i> Create an Account
+        </a>
+        
+        <div class="stats-counter">
+            <div class="stat-item">
+                <div class="stat-number" id="projectCounter">0</div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number" id="userCounter">0</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number" id="completionRate">0</div>
+                <div class="stat-label">Completion Rate</div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>&copy; 2023 Mbeya University of Science and Technology. All rights reserved.</p>
+    </footer>
+
+    <script src="assets/js/theme.js"></script>
+    <script>
+        // Counter animation
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    clearInterval(timer);
+                    current = target;
+                    if (element.id === 'completionRate') {
+                        element.textContent = target + '%';
+                    } else {
+                        element.textContent = Math.floor(current).toLocaleString();
+                    }
+                } else {
+                    if (element.id === 'completionRate') {
+                        element.textContent = Math.floor(current) + '%';
+                    } else {
+                        element.textContent = Math.floor(current).toLocaleString();
+                    }
+                }
+            }, 16);
+        }
+        
+        // Start counters when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(document.getElementById('projectCounter'), 1240);
+                    animateCounter(document.getElementById('userCounter'), 856);
+                    animateCounter(document.getElementById('completionRate'), 95);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        observer.observe(document.querySelector('.stats-counter'));
+        
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        let darkMode = false;
+        
+        themeToggle.addEventListener('click', () => {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark-mode', darkMode);
+            themeToggle.innerHTML = darkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            
+            // Change gradient for dark mode
+            if (darkMode) {
+                document.body.style.background = 'linear-gradient(135deg, #1a2a3a 0%, #0d1b2a 100%)';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, var(--must-blue) 0%, var(--must-dark) 100%)';
+            }
+        });
+        
+        // Add ripple effect to role cards
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.style.backgroundColor = 'rgba(255, 215, 0, 0.4)';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

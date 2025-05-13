@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUST PMS - Coordinator Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --must-primary: #3498db;       /* Light Blue */
+            --must-primary-light: #5dade2;
+            --must-primary-dark: #2980b9;
+            --must-secondary: #2c3e50;     /* Dark Grey */
+            --must-secondary-light: #34495e;
+            --must-accent: #e74c3c;        /* For alerts/important items */
+            --must-success: #2ecc71;
+            --must-warning: #f39c12;
+            --must-bg: #f8f9fa;
+            --must-bg-light: #ffffff;
+            --must-card: #ffffff;
+            --must-text: #2c3e50;
+            --must-text-light: #7f8c8d;
+            --must-border: #ecf0f1;
+            
+            /* Dark Theme Overrides */
+            --must-dark-primary: #3498db;
+            --must-dark-primary-light: #5dade2;
+            --must-dark-secondary: #34495e;
+            --must-dark-bg: #121212;
+            --must-dark-card: #1e1e1e;
+            --must-dark-text: #ecf0f1;
+            --must-dark-border: #2c3e50;
+        }
+
+        [data-theme="dark"] {
+            --must-primary: var(--must-dark-primary);
+            --must-primary-light: var(--must-dark-primary-light);
+            --must-secondary: var(--must-dark-secondary);
+            --must-bg: var(--must-dark-bg);
+            --must-bg-light: var(--must-dark-card);
+            --must-card: var(--must-dark-card);
+            --must-text: var(--must-dark-text);
+            --must-border: var(--must-dark-border);
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, 
+                        color 0.3s ease, 
+                        border-color 0.3s ease,
+                        transform 0.3s ease;
+        }
+
+        body {
+            background-color: var(--must-bg);
+            color: var(--must-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--must-secondary);
+            color: white;
+            padding: 1.5rem 0;
+            transform-origin: left;
+            animation: slideInFromLeft 0.5s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav li.active {
+            background: var(--must-primary);
+            position: relative;
+        }
+
+        .sidebar-nav li.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar-nav i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background: var(--must-bg-light);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+            color: var(--must-primary);
+            font-weight: 600;
+        }
+
+        .dashboard-header .subtitle {
+            color: var(--must-primary-light);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: var(--must-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--must-border);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--must-border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(var(--must-primary-rgb), 0.05);
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--must-primary);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== PROJECT ASSIGNMENT ===== */
+        .assignment-container {
+            display: flex;
+            gap: 1.5rem;
+            min-height: 400px;
+        }
+
+        .available-projects, .assigned-students {
+            flex: 1;
+            border: 1px solid var(--must-border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: var(--must-bg-light);
+        }
+
+        .assignment-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .project-list, .student-list {
+            list-style: none;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .project-item, .student-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            background: var(--must-card);
+            border: 1px solid var(--must-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .project-item:hover, .student-item:hover {
+            background: rgba(var(--must-primary-rgb), 0.1);
+            border-color: var(--must-primary);
+        }
+
+        .project-item.selected, .student-item.selected {
+            background: rgba(var(--must-primary-rgb), 0.2);
+            border-color: var(--must-primary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+        }
+
+        .project-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-supervisor {
+            font-size: 0.85rem;
+            color: var(--must-primary);
+        }
+
+        .student-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .student-program {
+            font-size: 0.85rem;
+            color: var(--must-text-light);
+        }
+
+        /* ===== CALENDAR ===== */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-title {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--must-primary);
+            padding: 0.5rem 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: rgba(var(--must-primary-rgb), 0.1);
+        }
+
+        .calendar-day.today {
+            background: var(--must-primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.event {
+            background: rgba(var(--must-primary-rgb), 0.1);
+            font-weight: 500;
+        }
+
+        .calendar-day.event::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--must-primary);
+        }
+
+        .calendar-day.event.presentation {
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .calendar-day.event.presentation::after {
+            background: var(--must-success);
+        }
+
+        .calendar-day.event.defense {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .calendar-day.event.defense::after {
+            background: var(--must-accent);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--must-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--must-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--must-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--must-secondary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* ===== NEW FEATURES ===== */
+        /* Announcements Section */
+        .announcement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .announcement-item {
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--must-card);
+            border-left: 4px solid var(--must-primary);
+            transition: all 0.3s ease;
+        }
+
+        .announcement-item:hover {
+            transform: translateX(5px);
+        }
+
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .announcement-title {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .announcement-date {
+            font-size: 0.85rem;
+            color: var(--must-text-light);
+        }
+
+        .announcement-content {
+            font-size: 0.9rem;
+        }
+
+        /* Statistics Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--must-card);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--must-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--must-text-light);
+        }
+
+        /* Supervisor Management */
+        .supervisor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .supervisor-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--must-card);
+            border: 1px solid var(--must-border);
+            transition: all 0.3s ease;
+        }
+
+        .supervisor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .supervisor-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .supervisor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--must-primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .supervisor-name {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .supervisor-students {
+            font-size: 0.85rem;
+            color: var(--must-text-light);
+        }
+
+        .supervisor-load {
+            height: 6px;
+            background: var(--must-border);
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .supervisor-load-bar {
+            height: 100%;
+            background: var(--must-primary);
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+
+        /* ===== RESPONSIVE ADJUSTMENTS ===== */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 240px;
+            }
+            
+            .assignment-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+        
+            .sidebar-nav ul {
+                display: flex;
+                overflow-x: auto;
+                padding: 0 1rem 0.5rem;
+                scrollbar-width: none;
+            }
+            
+            .sidebar-nav ul::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .sidebar-nav li {
+                margin-bottom: 0;
+                margin-right: 0.5rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            
+            .sidebar-nav li.active::after {
+                width: 100%;
+                height: 4px;
+                bottom: 0;
+                top: auto;
+                right: auto;
+            }
+            
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, minmax(30px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .assignment-actions {
+                flex-direction: row;
+                margin: 1rem 0;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .calendar-day {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body style="background: var(--must-bg); color: var(--must-text);">
+    <!--#include virtual="../../../../assets/components/navbar.html" -->
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-user-shield"></i> Coordinator Portal</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-project-diagram"></i> Projects</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
+                    <li><a href="#"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> Students</a></li>
+                    <li><a href="#"><i class="fas fa-chalkboard-teacher"></i> Supervisors</a></li>
+                    <li><a href="#"><i class="fas fa-file-export"></i> Reports</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div>
+                    <h1>Coordinator Dashboard</h1>
+                    <p class="subtitle">Academic Year 2023/2024 - Semester 1</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> New Announcement</button>
+                    <button class="btn btn-secondary"><i class="fas fa-file-export"></i> Generate Report</button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Project Assignment Section -->
+                <section class="card project-assignment">
+                    <div class="card-header">
+                        <h3><i class="fas fa-project-diagram"></i> Project Assignment</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="assignment-container">
+                            <div class="available-projects">
+                                <h4>Available Projects</h4>
+                                <ul class="project-list" id="availableProjects">
+                                    <li class="project-item selected">
+                                        <div class="project-title">AI in Healthcare</div>
+                                        <div class="project-supervisor">Dr. Smith</div>
+                                    </li>
+                                    <li class="project-item">
+                                        <div class="project-title">Renewable Energy</div>
+                                        <div class="project-supervisor">Dr. Johnson</div>
+                                    </li>
+                                    <li class="project-item">
+                                        <div class="project-title">Blockchain Security</div>
+                                        <div class="project-supervisor">Dr. Williams</div>
+                                    </li>
+                                    <li class="project-item">
+                                        <div class="project-title">Data Privacy</div>
+                                        <div class="project-supervisor">Dr. Brown</div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="assignment-actions">
+                                <button class="btn btn-secondary" id="assignBtn">
+                                    <i class="fas fa-arrow-right"></i> Assign
+                                </button>
+                                <button class="btn btn-secondary" id="unassignBtn">
+                                    <i class="fas fa-arrow-left"></i> Unassign
+                                </button>
+                            </div>
+                            <div class="assigned-students">
+                                <h4>Students</h4>
+                                <ul class="student-list" id="studentList">
+                                    <li class="student-item">
+                                        <div class="student-name">John Doe</div>
+                                        <div class="student-program">Computer Science - Year 4</div>
+                                    </li>
+                                    <li class="student-item selected">
+                                        <div class="student-name">Alice Smith</div>
+                                        <div class="student-program">Electrical Engineering - Year 4</div>
+                                    </li>
+                                    <li class="student-item">
+                                        <div class="student-name">Robert Johnson</div>
+                                        <div class="student-program">Information Technology - Year 3</div>
+                                    </li>
+                                    <li class="student-item">
+                                        <div class="student-name">Maria Brown</div>
+                                        <div class="student-program">Data Science - Year 4</div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Presentation Calendar Section -->
+                <section class="card calendar">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Presentation Schedule</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-header">
+                            <div class="calendar-title">June 2023</div>
+                            <div class="calendar-nav">
+                                <button class="btn btn-icon"><i class="fas fa-chevron-left"></i></button>
+                                <button class="btn btn-icon"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="calendar-day-header">Sun</div>
+                            <div class="calendar-day-header">Mon</div>
+                            <div class="calendar-day-header">Tue</div>
+                            <div class="calendar-day-header">Wed</div>
+                            <div class="calendar-day-header">Thu</div>
+                            <div class="calendar-day-header">Fri</div>
+                            <div class="calendar-day-header">Sat</div>
+                            
+                            <!-- Calendar days -->
+                            <div class="calendar-day">28</div>
+                            <div class="calendar-day">29</div>
+                            <div class="calendar-day">30</div>
+                            <div class="calendar-day">31</div>
+                            <div class="calendar-day">1</div>
+                            <div class="calendar-day">2</div>
+                            <div class="calendar-day">3</div>
+                            
+                            <div class="calendar-day">4</div>
+                            <div class="calendar-day">5</div>
+                            <div class="calendar-day event presentation">6</div>
+                            <div class="calendar-day">7</div>
+                            <div class="calendar-day event presentation">8</div>
+                            <div class="calendar-day">9</div>
+                            <div class="calendar-day">10</div>
+                            
+                            <div class="calendar-day">11</div>
+                            <div class="calendar-day today event defense">12</div>
+                            <div class="calendar-day">13</div>
+                            <div class="calendar-day event presentation">14</div>
+                            <div class="calendar-day">15</div>
+                            <div class="calendar-day">16</div>
+                            <div class="calendar-day">17</div>
+                            
+                            <div class="calendar-day">18</div>
+                            <div class="calendar-day event defense">19</div>
+                            <div class="calendar-day">20</div>
+                            <div class="calendar-day">21</div>
+                            <div class="calendar-day">22</div>
+                            <div class="calendar-day">23</div>
+                            <div class="calendar-day">24</div>
+                            
+                            <div class="calendar-day">25</div>
+                            <div class="calendar-day">26</div>
+                            <div class="calendar-day">27</div>
+                            <div class="calendar-day">28</div>
+                            <div class="calendar-day">29</div>
+                            <div class="calendar-day">30</div>
+                            <div class="calendar-day">1</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Additional Features Sections -->
+                <!-- Announcements Section -->
+                <section class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bullhorn"></i> Recent Announcements</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="announcement-list">
+                            <div class="announcement-item">
+                                <div class="announcement-header">
+                                    <div class="announcement-title">Mid-term Presentation Schedule</div>
+                                    <div class="announcement-date">June 5, 2023</div>
+                                </div>
+                                <div class="announcement-content">
+                                    The schedule for mid-term presentations has been published. Please check the calendar for your assigned time slot.
+                                </div>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-header">
+                                    <div class="announcement-title">Thesis Submission Deadline</div>
+                                    <div class="announcement-date">May 28, 2023</div>
+                                </div>
+                                <div class="announcement-content">
+                                    Reminder: Final thesis submissions are due by August 15th. Late submissions will incur penalties.
+                                </div>
+                            </div>
+                            <div class="announcement-item">
+                                <div class="announcement-header">
+                                    <div class="announcement-title">Supervisor Meeting Requirements</div>
+                                    <div class="announcement-date">May 15, 2023</div>
+                                </div>
+                                <div class="announcement-content">
+                                    All students are required to meet with their supervisors at least twice per month. Meeting logs must be submitted through the system.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Statistics Overview Section -->
+                <section class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Program Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">42</div>
+                                <div class="stat-label">Active Projects</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">18</div>
+                                <div class="stat-label">Supervisors</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">86%</div>
+                                <div class="stat-label">On Track</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">7</div>
+                                <div class="stat-label">Delayed</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Supervisor Management Section -->
+                <section class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chalkboard-teacher"></i> Supervisor Workload</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="supervisor-grid">
+                            <div class="supervisor-card">
+                                <div class="supervisor-info">
+                                    <div class="supervisor-avatar">DS</div>
+                                    <div>
+                                        <div class="supervisor-name">Dr. Smith</div>
+                                        <div class="supervisor-students">3 students</div>
+                                    </div>
+                                </div>
+                                <div class="supervisor-load">
+                                    <div class="supervisor-load-bar" style="width: 60%;"></div>
+                                </div>
+                                <div class="supervisor-status">Moderate workload</div>
+                            </div>
+                            <div class="supervisor-card">
+                                <div class="supervisor-info">
+                                    <div class="supervisor-avatar">JW</div>
+                                    <div>
+                                        <div class="supervisor-name">Dr. Johnson</div>
+                                        <div class="supervisor-students">5 students</div>
+                                    </div>
+                                </div>
+                                <div class="supervisor-load">
+                                    <div class="supervisor-load-bar" style="width: 85%;"></div>
+                                </div>
+                                <div class="supervisor-status">High workload</div>
+                            </div>
+                            <div class="supervisor-card">
+                                <div class="supervisor-info">
+                                    <div class="supervisor-avatar">BW</div>
+                                    <div>
+                                        <div class="supervisor-name">Dr. Williams</div>
+                                        <div class="supervisor-students">2 students</div>
+                                    </div>
+                                </div>
+                                <div class="supervisor-load">
+                                    <div class="supervisor-load-bar" style="width: 40%;"></div>
+                                </div>
+                                <div class="supervisor-status">Light workload</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <!--#include virtual="../../../../assets/components/footer.html" -->
+
+    <script src="../../../../assets/js/modules/coordinator.js"></script>
+    <script src="../../../../assets/js/theme.js"></script>
+    <script>
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', function() {
+            // Convert primary color to RGB for rgba() usage
+            const primaryColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--must-primary')
+                .trim();
+            const rgb = hexToRgb(primaryColor);
+            document.documentElement.style.setProperty('--must-primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+            
+            // Animate progress bars
+            const progressBars = document.querySelectorAll('.supervisor-load-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // Make cards interactive
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Project assignment interactions
+            document.querySelectorAll('.project-item, .student-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+            
+            // Calendar day interactions
+            document.querySelectorAll('.calendar-day.event').forEach(day => {
+                day.addEventListener('click', function() {
+                    alert(`Event details for ${this.textContent} June:\n${this.classList.contains('presentation') ? 'Project Presentation' : 'Thesis Defense'}`);
+                });
+            });
+        });
+        
+        // Helper function to convert hex to rgb
+        function hexToRgb(hex) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+            
+            // Parse r, g, b values
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return { r, g, b };
+        }
+    </script>
+    <script>
+        // Initialize coordinator dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            dashboard.initDashboard('coordinator');
+            
+            // Header action buttons
+            document.querySelector('.btn-primary').addEventListener('click', function() {
+                alert('Opening new announcement form');
+            });
+            
+            document.querySelector('.btn-secondary').addEventListener('click', function() {
+                alert('Generating system report... This would download a PDF report');
+            });
+            
+            // Announcement item clicks
+            document.querySelectorAll('.announcement-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const title = this.querySelector('.announcement-title').textContent;
+                    alert(`Viewing full announcement: ${title}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

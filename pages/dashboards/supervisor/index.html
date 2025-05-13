@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUST PMS - Supervisor Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --must-primary: #3498db;       /* Light Blue */
+            --must-primary-light: #5dade2;
+            --must-primary-dark: #2980b9;
+            --must-secondary: #2c3e50;     /* Dark Grey */
+            --must-secondary-light: #34495e;
+            --must-accent: #e74c3c;        /* For alerts/important items */
+            --must-success: #2ecc71;
+            --must-warning: #f39c12;
+            --must-bg: #f8f9fa;
+            --must-bg-light: #ffffff;
+            --must-card: #ffffff;
+            --must-text: #2c3e50;
+            --must-text-light: #7f8c8d;
+            --must-border: #ecf0f1;
+            
+            /* Dark Theme Overrides */
+            --must-dark-primary: #3498db;
+            --must-dark-primary-light: #5dade2;
+            --must-dark-secondary: #34495e;
+            --must-dark-bg: #121212;
+            --must-dark-card: #1e1e1e;
+            --must-dark-text: #ecf0f1;
+            --must-dark-border: #2c3e50;
+        }
+
+        [data-theme="dark"] {
+            --must-primary: var(--must-dark-primary);
+            --must-primary-light: var(--must-dark-primary-light);
+            --must-secondary: var(--must-dark-secondary);
+            --must-bg: var(--must-dark-bg);
+            --must-bg-light: var(--must-dark-card);
+            --must-card: var(--must-dark-card);
+            --must-text: var(--must-dark-text);
+            --must-border: var(--must-dark-border);
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, 
+                        color 0.3s ease, 
+                        border-color 0.3s ease,
+                        transform 0.3s ease;
+        }
+
+        body {
+            background-color: var(--must-bg);
+            color: var(--must-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--must-secondary);
+            color: white;
+            padding: 1.5rem 0;
+            transform-origin: left;
+            animation: slideInFromLeft 0.5s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav li.active {
+            background: var(--must-primary);
+            position: relative;
+        }
+
+        .sidebar-nav li.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar-nav i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .dashboard-main {
+            flex: 1;
+            padding: 2rem;
+            background: var(--must-bg-light);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+            color: var(--must-primary);
+            font-weight: 600;
+        }
+
+        .dashboard-header .subtitle {
+            color: var(--must-primary-light);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: var(--must-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--must-border);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--must-border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(var(--must-primary-rgb), 0.05);
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--must-primary);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== STUDENT PROGRESS ===== */
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .student-card {
+            background: var(--must-card);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--must-border);
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--must-primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .student-project {
+            font-size: 0.85rem;
+            color: var(--must-text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-container {
+            height: 6px;
+            background: var(--must-border);
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--must-primary);
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .progress-percent {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .progress-status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-ontrack {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--must-success);
+        }
+
+        .status-delayed {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--must-accent);
+        }
+
+        .status-needs-review {
+            background: rgba(241, 196, 15, 0.1);
+            color: var(--must-warning);
+        }
+
+        /* ===== TASK MANAGEMENT ===== */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--must-card);
+            border-radius: 8px;
+            border: 1px solid var(--must-border);
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            border-left: 4px solid var(--must-primary);
+        }
+
+        .task-checkbox {
+            margin-right: 1rem;
+            accent-color: var(--must-primary);
+        }
+
+        .task-details {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-student {
+            font-size: 0.85rem;
+            color: var(--must-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-deadline {
+            font-size: 0.75rem;
+            color: var(--must-text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .task-urgent .task-deadline {
+            color: var(--must-accent);
+            font-weight: 500;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .task-btn {
+            background: transparent;
+            border: none;
+            color: var(--must-primary);
+            cursor: pointer;
+            font-size: 1rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-btn:hover {
+            background: rgba(var(--must-primary-rgb), 0.1);
+        }
+
+        /* ===== DOCUMENT APPROVAL ===== */
+        .document-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--must-card);
+            border-radius: 8px;
+            border: 1px solid var(--must-border);
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            transform: translateX(5px);
+            border-left: 4px solid var(--must-primary);
+        }
+
+        .document-icon {
+            margin-right: 1rem;
+            color: var(--must-primary);
+            font-size: 1.5rem;
+        }
+
+        .document-details {
+            flex: 1;
+        }
+
+        .document-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .document-student {
+            font-size: 0.85rem;
+            color: var(--must-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .document-submitted {
+            font-size: 0.75rem;
+            color: var(--must-text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .document-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-approve {
+            background: var(--must-success);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #27ae60;
+        }
+
+        .btn-reject {
+            background: var(--must-accent);
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c0392b;
+        }
+
+        .btn-review {
+            background: var(--must-primary);
+            color: white;
+        }
+
+        .btn-review:hover {
+            background: var(--must-primary-dark);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--must-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--must-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--must-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--must-secondary-light);
+            transform: translateY(-2px);
+        }
+
+        /* ===== NEW FEATURES ===== */
+        /* Calendar Widget */
+        .calendar-widget {
+            padding: 1rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .calendar-title {
+            font-weight: 600;
+            color: var(--must-primary);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--must-primary);
+            padding: 0.5rem 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-day:hover {
+            background: rgba(var(--must-primary-rgb), 0.1);
+        }
+
+        .calendar-day.today {
+            background: var(--must-primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.event {
+            position: relative;
+        }
+
+        .calendar-day.event::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--must-primary);
+        }
+
+        /* Meeting Schedule */
+        .meeting-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: var(--must-card);
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--must-primary);
+        }
+
+        .meeting-time {
+            font-weight: 600;
+            color: var(--must-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .meeting-student {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .meeting-purpose {
+            font-size: 0.8rem;
+            color: var(--must-text-light);
+        }
+
+        /* ===== RESPONSIVE ADJUSTMENTS ===== */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+        
+            .sidebar-nav ul {
+                display: flex;
+                overflow-x: auto;
+                padding: 0 1rem 0.5rem;
+                scrollbar-width: none;
+            }
+            
+            .sidebar-nav ul::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .sidebar-nav li {
+                margin-bottom: 0;
+                margin-right: 0.5rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            
+            .sidebar-nav li.active::after {
+                width: 100%;
+                height: 4px;
+                bottom: 0;
+                top: auto;
+                right: auto;
+            }
+            
+            .dashboard-main {
+                padding: 1.5rem;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .progress-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .document-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            
+            .document-btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .task-actions {
+                flex-direction: column;
+            }
+            
+            .task-btn {
+                width: 100%;
+                border-radius: 4px;
+                margin-bottom: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body style="background: var(--must-bg); color: var(--must-text);">
+    <!--#include virtual="../../../../assets/components/navbar.html" -->
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-user-tie"></i> Supervisor Portal</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> My Students</a></li>
+                    <li><a href="#"><i class="fas fa-comments"></i> Messages</a></li>
+                    <li><a href="#"><i class="fas fa-file-check"></i> Approvals</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
+                    <li><a href="#"><i class="fas fa-chart-pie"></i> Reports</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <h1>Supervisor Dashboard</h1>
+                    <p class="subtitle">You have <span class="highlight">5 students</span> under your supervision</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Meeting</button>
+                    <button class="btn btn-secondary"><i class="fas fa-file-export"></i> Generate Report</button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Student Progress Section -->
+                <section class="card student-progress">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Student Progress</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-grid">
+                            <div class="student-card">
+                                <div class="student-info">
+                                    <div class="student-avatar">JD</div>
+                                    <div>
+                                        <div class="student-name">John Doe</div>
+                                        <div class="student-project">AI in Healthcare</div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 75%;"></div>
+                                </div>
+                                <div class="progress-details">
+                                    <span class="progress-percent">75%</span>
+                                    <span class="progress-status status-ontrack">On Track</span>
+                                </div>
+                            </div>
+                            
+                            <div class="student-card">
+                                <div class="student-info">
+                                    <div class="student-avatar">AS</div>
+                                    <div>
+                                        <div class="student-name">Alice Smith</div>
+                                        <div class="student-project">Renewable Energy</div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 90%;"></div>
+                                </div>
+                                <div class="progress-details">
+                                    <span class="progress-percent">90%</span>
+                                    <span class="progress-status status-ontrack">On Track</span>
+                                </div>
+                            </div>
+                            
+                            <div class="student-card">
+                                <div class="student-info">
+                                    <div class="student-avatar">RJ</div>
+                                    <div>
+                                        <div class="student-name">Robert Johnson</div>
+                                        <div class="student-project">Blockchain Security</div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 45%;"></div>
+                                </div>
+                                <div class="progress-details">
+                                    <span class="progress-percent">45%</span>
+                                    <span class="progress-status status-delayed">Delayed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="student-card">
+                                <div class="student-info">
+                                    <div class="student-avatar">MB</div>
+                                    <div>
+                                        <div class="student-name">Maria Brown</div>
+                                        <div class="student-project">Data Privacy</div>
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 60%;"></div>
+                                </div>
+                                <div class="progress-details">
+                                    <span class="progress-percent">60%</span>
+                                    <span class="progress-status status-needs-review">Needs Review</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Task Management Section -->
+                <section class="card task-management">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tasks"></i> Task Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="task-list" id="taskList">
+                            <div class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <div class="task-details">
+                                    <div class="task-title">Review Literature Review Draft</div>
+                                    <div class="task-student">John Doe - AI in Healthcare</div>
+                                    <div class="task-deadline"><i class="fas fa-clock"></i> Due tomorrow</div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="task-btn"><i class="fas fa-comment"></i></button>
+                                    <button class="task-btn"><i class="fas fa-calendar-plus"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="task-item task-urgent">
+                                <input type="checkbox" class="task-checkbox">
+                                <div class="task-details">
+                                    <div class="task-title">Approve Methodology Chapter</div>
+                                    <div class="task-student">Alice Smith - Renewable Energy</div>
+                                    <div class="task-deadline"><i class="fas fa-exclamation-circle"></i> Overdue by 2 days</div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="task-btn"><i class="fas fa-comment"></i></button>
+                                    <button class="task-btn"><i class="fas fa-calendar-plus"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <div class="task-details">
+                                    <div class="task-title">Schedule Mid-term Review</div>
+                                    <div class="task-student">Robert Johnson - Blockchain Security</div>
+                                    <div class="task-deadline"><i class="fas fa-clock"></i> Due in 3 days</div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="task-btn"><i class="fas fa-comment"></i></button>
+                                    <button class="task-btn"><i class="fas fa-calendar-plus"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="task-item">
+                                <input type="checkbox" class="task-checkbox">
+                                <div class="task-details">
+                                    <div class="task-title">Provide Feedback on Results</div>
+                                    <div class="task-student">Maria Brown - Data Privacy</div>
+                                    <div class="task-deadline"><i class="fas fa-clock"></i> Due in 1 week</div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="task-btn"><i class="fas fa-comment"></i></button>
+                                    <button class="task-btn"><i class="fas fa-calendar-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Document Approval Section -->
+                <section class="card document-approval">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-signature"></i> Document Approval</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="document-list" id="documentList">
+                            <li class="document-item">
+                                <div class="document-icon"><i class="fas fa-file-alt"></i></div>
+                                <div class="document-details">
+                                    <div class="document-title">Literature Review Draft</div>
+                                    <div class="document-student">John Doe - AI in Healthcare</div>
+                                    <div class="document-submitted"><i class="fas fa-clock"></i> Submitted 2 days ago</div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn btn-approve">Approve</button>
+                                    <button class="document-btn btn-reject">Reject</button>
+                                    <button class="document-btn btn-review">Review</button>
+                                </div>
+                            </li>
+                            
+                            <li class="document-item">
+                                <div class="document-icon"><i class="fas fa-file-code"></i></div>
+                                <div class="document-details">
+                                    <div class="document-title">Methodology Chapter</div>
+                                    <div class="document-student">Alice Smith - Renewable Energy</div>
+                                    <div class="document-submitted"><i class="fas fa-clock"></i> Submitted 1 week ago</div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn btn-approve">Approve</button>
+                                    <button class="document-btn btn-reject">Reject</button>
+                                    <button class="document-btn btn-review">Review</button>
+                                </div>
+                            </li>
+                            
+                            <li class="document-item">
+                                <div class="document-icon"><i class="fas fa-file-contract"></i></div>
+                                <div class="document-details">
+                                    <div class="document-title">Ethics Approval Form</div>
+                                    <div class="document-student">Robert Johnson - Blockchain Security</div>
+                                    <div class="document-submitted"><i class="fas fa-clock"></i> Submitted yesterday</div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn btn-approve">Approve</button>
+                                    <button class="document-btn btn-reject">Reject</button>
+                                    <button class="document-btn btn-review">Review</button>
+                                </div>
+                            </li>
+                            
+                            <li class="document-item">
+                                <div class="document-icon"><i class="fas fa-file-excel"></i></div>
+                                <div class="document-details">
+                                    <div class="document-title">Data Analysis Results</div>
+                                    <div class="document-student">Maria Brown - Data Privacy</div>
+                                    <div class="document-submitted"><i class="fas fa-clock"></i> Submitted 3 days ago</div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-btn btn-approve">Approve</button>
+                                    <button class="document-btn btn-reject">Reject</button>
+                                    <button class="document-btn btn-review">Review</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Additional Features Sections -->
+                <section class="card calendar-widget">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Upcoming Meetings</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-header">
+                            <div class="calendar-title">June 2023</div>
+                            <div class="calendar-nav">
+                                <button class="task-btn"><i class="fas fa-chevron-left"></i></button>
+                                <button class="task-btn"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="meeting-item">
+                            <div class="meeting-time">Tomorrow, 2:00 PM</div>
+                            <div class="meeting-student">John Doe - Progress Review</div>
+                            <div class="meeting-purpose">Discuss literature review findings</div>
+                        </div>
+                        
+                        <div class="meeting-item">
+                            <div class="meeting-time">Friday, 10:00 AM</div>
+                            <div class="meeting-student">All Students - Group Meeting</div>
+                            <div class="meeting-purpose">Mid-term progress presentations</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Performance Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 200px; display: flex; align-items: center; justify-content: center; color: var(--must-text-light);">
+                            [Performance Chart Placeholder]
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <!--#include virtual="../../../../assets/components/footer.html" -->
+
+    <script src="../../../../assets/js/modules/chat.js"></script>
+    <script src="../../../../assets/js/theme.js"></script>
+    <script>
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', function() {
+            // Convert primary color to RGB for rgba() usage
+            const primaryColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--must-primary')
+                .trim();
+            const rgb = hexToRgb(primaryColor);
+            document.documentElement.style.setProperty('--must-primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+            
+            // Animate progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // Make cards interactive
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Task item interactions
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('task-checkbox') && !e.target.closest('.task-actions')) {
+                        this.classList.toggle('task-expanded');
+                    }
+                });
+            });
+            
+            // Document approval buttons
+            document.querySelectorAll('.document-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const documentItem = this.closest('.document-item');
+                    documentItem.style.opacity = '0.5';
+                    setTimeout(() => {
+                        documentItem.remove();
+                    }, 500);
+                });
+            });
+        });
+        
+        // Helper function to convert hex to rgb
+        function hexToRgb(hex) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+            
+            // Parse r, g, b values
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return { r, g, b };
+        }
+    </script>
+    <script>
+        // Initialize supervisor dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            dashboard.initDashboard('supervisor');
+            
+            // Header action buttons
+            document.querySelector('.btn-primary').addEventListener('click', function() {
+                alert('Opening meeting scheduling interface');
+            });
+            
+            document.querySelector('.btn-secondary').addEventListener('click', function() {
+                alert('Generating report... This would download a PDF report');
+            });
+        });
+    </script>
+</body>
+</html>
